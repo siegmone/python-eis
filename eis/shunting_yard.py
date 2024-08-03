@@ -115,6 +115,8 @@ class ShuntingYard:
             case "W":
                 token.set_opt(ComponentType.W)
                 self.output_queue.append(token)
+            case _:
+                self.output_queue.append(token)
 
     def parse_operator(self, token):
         flag = True
