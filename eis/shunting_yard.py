@@ -131,7 +131,6 @@ class ShuntingYard:
         if flag:
             self.operator_stack.append(token)
 
-
     def handle_pop(self):
         return self.operator_stack.pop()
 
@@ -178,8 +177,12 @@ class ShuntingYard:
         while self.peek().isalpha():
             self.advance()
         text = self.src[self.start:self.current]
-        self.components_counter[text] = self.components_counter.get(text, 0) + 1
-        self.add_token(TokenType.COMPONENT, f"{text}{self.components_counter[text]}")
+        self.components_counter[text] = self.components_counter.get(
+            text, 0) + 1
+        self.add_token(
+            TokenType.COMPONENT,
+            f"{text}{self.components_counter[text]}"
+        )
 
     def advance(self):
         next_char = self.src[self.current]

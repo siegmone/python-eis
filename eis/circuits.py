@@ -2,6 +2,7 @@ from shunting_yard import ShuntingYard, TokenType, ComponentType, Token
 from math import pi
 from numpy import sqrt
 
+
 def imp_C(f, C):
     return 1 / (1j * 2 * pi * f * C)
 
