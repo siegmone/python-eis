@@ -1,4 +1,4 @@
-from shunting_yard import ShuntingYard, TokenType, ComponentType, Token
+from shunting_yard import ShuntingYard, TokenType, Component, Token
 from math import pi
 from numpy import sqrt
 
@@ -11,7 +11,7 @@ def imp_L(f, L):
     return 1j * 2 * pi * f * L
 
 
-def imp_Q(f, Q, a):
+def imp_Q(f, Q, a=1):
     return Q / (1j * 2 * pi * f) ** a
 
 
@@ -30,11 +30,11 @@ def parallel(*args):
 class Circuit:
     def __init__(self, circuit: str):
         self.circuit = circuit
-        self.circuit_rpn = ShuntingYard().run(circuit)
+        self.rpn = ShuntingYard().run(circuit)
         self.components = []
-        for token in self.circuit_rpn:
+        for token in self.rpn:
             if token.token_type == TokenType.COMPONENT:
-                setattr(self, token.literal, 1)
+                setattr(self, token.literal, 1)  # fix default value
                 self.components.append(token.literal)
         self.impedance = 0
 
@@ -49,21 +49,21 @@ class Circuit:
 
     def evaluate_component(self, token: Token, frequency: float):
         match token.opt:
-            case ComponentType.R:
+            case Component.R:
                 # return imp_R(frequency, getattr(self, token.literal))
                 return getattr(self, token.literal)
-            case ComponentType.C:
+            case Component.C:
                 return imp_C(frequency, getattr(self, token.literal))
-            case ComponentType.L:
+            case Component.L:
                 return imp_L(frequency, getattr(self, token.literal))
-            case ComponentType.Q:
+            case Component.Q:
                 return imp_Q(frequency, getattr(self, token.literal))
-            case ComponentType.W:
+            case Component.W:
                 return imp_W(frequency, getattr(self, token.literal))
 
     def evaluate(self, frequency: float = 1):
         stack = []
-        for token in self.circuit_rpn:
+        for token in self.rpn:
             if token.token_type == TokenType.COMPONENT:
                 stack.append(self.evaluate_component(token, frequency))
             elif token.token_type == TokenType.DASH:
@@ -80,7 +80,7 @@ class Circuit:
 
 if __name__ == "__main__":
     circuit = Circuit("R | R")
-    print(circuit.circuit_rpn)
+    print(circuit.rpn)
     # circuit.evaluate()
     # print(circuit.get_components())
     print(circuit.evaluate())

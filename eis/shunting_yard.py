@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class ComponentType(Enum):
+class Component(Enum):
     R = 1
     C = 2
     L = 3
@@ -12,8 +12,8 @@ class ComponentType(Enum):
 class TokenType(Enum):
     PIPE = 1
     DASH = 2
-    LEFT_PAREN = 3
-    RIGHT_PAREN = 4
+    LPAR = 3
+    RPAR = 4
     EOF = 5
     COMPONENT = 6
 
@@ -36,15 +36,16 @@ class Token:
 
 
 def precedence(token):
-    if token == TokenType.DASH:
+    if token.token_type == TokenType.DASH:
         return 1
-    if token == TokenType.PIPE:
+    if token.token_type == TokenType.PIPE:
         return 2
     return 0
 
 
 class ShuntingYard:
     def __init__(self):
+        self.src = ""
         self.tokens = []
         self.start = 0
         self.current = 0
@@ -89,10 +90,10 @@ class ShuntingYard:
                 self.parse_operator(token)
             case TokenType.DASH:
                 self.parse_operator(token)
-            case TokenType.LEFT_PAREN:
+            case TokenType.LPAR:
                 self.operator_stack.append(token)
-            case TokenType.RIGHT_PAREN:
-                while self.operator_stack[-1].token_type != TokenType.LEFT_PAREN:
+            case TokenType.RPAR:
+                while self.operator_stack[-1].token_type != TokenType.LPAR:
                     self.output_queue.append(self.handle_pop())
                     if not self.operator_stack:
                         raise Exception("Parenthesis mismatch")
@@ -101,19 +102,19 @@ class ShuntingYard:
     def handle_component(self, token):
         match token.lexeme:
             case "R":
-                token.set_opt(ComponentType.R)
+                token.set_opt(Component.R)
                 self.output_queue.append(token)
             case "C":
-                token.set_opt(ComponentType.C)
+                token.set_opt(Component.C)
                 self.output_queue.append(token)
             case "L":
-                token.set_opt(ComponentType.L)
+                token.set_opt(Component.L)
                 self.output_queue.append(token)
             case "Q":
-                token.set_opt(ComponentType.Q)
+                token.set_opt(Component.Q)
                 self.output_queue.append(token)
             case "W":
-                token.set_opt(ComponentType.W)
+                token.set_opt(Component.W)
                 self.output_queue.append(token)
             case _:
                 self.output_queue.append(token)
@@ -124,7 +125,7 @@ class ShuntingYard:
             self.operator_stack.append(token)
             flag = False
         while (flag and self.operator_stack and
-               self.operator_stack[-1].token_type != TokenType.LEFT_PAREN) and (
+               self.operator_stack[-1].token_type != TokenType.LPAR) and (
                 precedence(self.operator_stack[-1]) > precedence(token)
         ):
             self.output_queue.append(self.handle_pop())
@@ -158,9 +159,9 @@ class ShuntingYard:
         char: str = self.advance()
         match char:
             case "(":  # )
-                self.add_token(TokenType.LEFT_PAREN)
+                self.add_token(TokenType.LPAR)
             case ")":  # )
-                self.add_token(TokenType.RIGHT_PAREN)
+                self.add_token(TokenType.RPAR)
             case '-':
                 self.add_token(TokenType.DASH)
             case '|':
