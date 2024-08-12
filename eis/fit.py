@@ -1,6 +1,3 @@
-def residuals():
-    pass
-
-
-def fit():
-    pass
+def residuals(reference, data):
+    res = reference - data
+    return res

@@ -29,3 +29,7 @@ def test_parenthesis3():
     shunting_yard = ShuntingYard()
     result = shunting_yard.run_str("A - ( B | C - D )")
     assert result == "A B C | D - -"
+
+
+def test_named_components():
+    pass

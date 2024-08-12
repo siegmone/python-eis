@@ -70,8 +70,10 @@ class ShuntingYard:
         return self.output_queue
 
     def run_str(self, src):
-        self.run(src)
-        lexemes = [token.lexeme for token in self.output_queue]
+        return self.to_str(self.run(src))
+
+    def to_str(self, token_list):
+        lexemes = [token.lexeme for token in token_list]
         return " ".join(lexemes)
 
     def parse_tokens(self):
