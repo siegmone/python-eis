@@ -1,4 +1,4 @@
-from shunting_yard import ShuntingYard, TokenType, Component, Token
+from .shunting_yard import ShuntingYard, TokenType, Component, Token
 from math import pi
 from numpy import sqrt
 
@@ -34,7 +34,7 @@ class Circuit:
         self.components = []
         for token in self.rpn:
             if token.token_type == TokenType.COMPONENT:
-                setattr(self, token.literal, 1)  # fix default value
+                setattr(self, token.literal, 1)  # fix default value in the literals
                 self.components.append(token.literal)
         self.impedance = 0
 
@@ -50,7 +50,6 @@ class Circuit:
     def evaluate_component(self, token: Token, frequency: float):
         match token.opt:
             case Component.R:
-                # return imp_R(frequency, getattr(self, token.literal))
                 return getattr(self, token.literal)
             case Component.C:
                 return imp_C(frequency, getattr(self, token.literal))
@@ -78,9 +77,3 @@ class Circuit:
         return self.impedance
 
 
-if __name__ == "__main__":
-    circuit = Circuit("R | R")
-    print(circuit.rpn)
-    # circuit.evaluate()
-    # print(circuit.get_components())
-    print(circuit.evaluate())
